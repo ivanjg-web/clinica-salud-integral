@@ -1,0 +1,72 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AppointmentStatus {
+  PROGRAMADA
+  COMPLETADA
+  CANCELADA
+}
+
+enum Role {
+  RECEPCIONISTA
+  MEDICO
+  GERENCIA
+}
+
+model Specialty {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  doctors Doctor[]
+
+  @@map("specialties")
+}
+
+model Patient {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  birthDate    DateTime      @map("birth_date") @db.Date
+  appointments Appointment[]
+
+  @@map("patients")
+}
+
+model Doctor {
+  id           Int           @id @default(autoincrement())
+  name         String
+  specialtyId  Int           @map("specialty_id")
+  specialty    Specialty     @relation(fields: [specialtyId], references: [id])
+  appointments Appointment[]
+
+  @@map("doctors")
+}
+
+model Appointment {
+  id          Int               @id @default(autoincrement())
+  scheduledAt DateTime          @map("scheduled_at")
+  status      AppointmentStatus @default(PROGRAMADA)
+
+  patientId Int @map("patient_id")
+  doctorId  Int @map("doctor_id")
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+
+  @@map("appointments")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  role     Role
+
+  @@map("users")
+}
