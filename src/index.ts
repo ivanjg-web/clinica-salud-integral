@@ -10,6 +10,8 @@ import specialtyRoutes from "./routes/specialty.routes.ts";
 import patientRoutes from "./routes/patient.routes.ts";
 import doctorRoutes from "./routes/doctor.routes.ts";
 import authRoutes from "./routes/auth.routes.ts";
+import appointmentRoutes from "./routes/appointment.routes.ts";
+import reportsRoutes from "./routes/reports.routes.ts";
 
 const require = createRequire(import.meta.url);
 const swaggerDocument = require("./swagger/swagger-output.json");
@@ -25,6 +27,8 @@ app.use("/api/specialties", specialtyRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/reports", reportsRoutes);
 
 const PORT = process.env.PORT || 3000;
 

@@ -5,11 +5,16 @@ import { prisma } from "../config/prisma.ts";
 
 export async function register(req: Request, res: Response) {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role, doctorId } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { email, password: hashedPassword, role },
+      data: {
+        email,
+        password: hashedPassword,
+        role,
+        doctorId: role === "MEDICO" ? doctorId : null,
+      },
       select: { id: true, email: true, role: true },
     });
 
@@ -29,7 +34,12 @@ export async function login(req: Request, res: Response) {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        doctorId: user.doctorId,
+      },
       process.env.JWT_SECRET as string,
       { expiresIn: "8h" },
     );
