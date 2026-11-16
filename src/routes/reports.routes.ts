@@ -16,7 +16,12 @@ router.get(
   verifyToken,
   authorize("GERENCIA"),
   (req, res) => {
-    /* #swagger.security = [{ "bearerAuth": [] }] */
+    /*
+      #swagger.tags = ['Reportes']
+      #swagger.summary = 'Consultar citas por especialidad'
+      #swagger.description = 'Genera un reporte con la cantidad de citas agrupadas por especialidad médica. Disponible únicamente para usuarios con rol GERENCIA.'
+      #swagger.security = [{ "bearerAuth": [] }]
+    */
     return consultarCitasPorEspecialidad(req, res);
   },
 );
@@ -27,7 +32,12 @@ router.get(
   authorize("GERENCIA"),
   validateReportDate,
   (req, res) => {
-    /* #swagger.security = [{ "bearerAuth": [] }] */
+    /*
+      #swagger.tags = ['Reportes']
+      #swagger.summary = 'Consultar corte diario'
+      #swagger.description = 'Genera un resumen de las citas correspondientes a una fecha específica, agrupadas según su estado. Requiere autenticación JWT y rol GERENCIA.'
+      #swagger.security = [{ "bearerAuth": [] }]
+    */
     return consultarCorteDiario(req, res);
   },
 );

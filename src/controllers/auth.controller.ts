@@ -6,6 +6,19 @@ import { prisma } from "../config/prisma.ts";
 export async function register(req: Request, res: Response) {
   try {
     const { email, password, role, doctorId } = req.body;
+
+    if (role === "MEDICO") {
+      const doctor = await prisma.doctor.findUnique({
+        where: { id: doctorId },
+      });
+
+      if (!doctor) {
+        return res.status(404).json({
+          message: "El médico indicado no existe",
+        });
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
@@ -15,11 +28,28 @@ export async function register(req: Request, res: Response) {
         role,
         doctorId: role === "MEDICO" ? doctorId : null,
       },
-      select: { id: true, email: true, role: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        doctorId: true,
+      },
     });
 
     res.status(201).json(user);
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "P2002") {
+      return res.status(409).json({
+        message: "Ya existe un usuario con ese correo electrónico",
+      });
+    }
+
+    if (error instanceof Error && "code" in error && error.code === "P2003") {
+      return res.status(400).json({
+        message: "La referencia al médico no es válida",
+      });
+    }
+
     res.status(500).json({ message: "Error al registrar el usuario" });
   }
 }

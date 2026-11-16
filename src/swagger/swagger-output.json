@@ -14,7 +14,11 @@
   "paths": {
     "/api/specialties/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Especialidades"
+        ],
+        "summary": "Listar especialidades médicas",
+        "description": "Obtiene el listado de todas las especialidades médicas registradas en la clínica.",
         "responses": {
           "200": {
             "description": "OK"
@@ -27,7 +31,11 @@
     },
     "/api/patients/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Listar pacientes",
+        "description": "Obtiene el listado de pacientes registrados en la clínica. Requiere autenticación JWT y rol RECEPCIONISTA.",
         "parameters": [
           {
             "name": "authorization",
@@ -58,7 +66,11 @@
         ]
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Registrar paciente",
+        "description": "Registra un nuevo paciente en la clínica después de validar los datos enviados. Requiere autenticación JWT y rol RECEPCIONISTA.",
         "parameters": [
           {
             "name": "authorization",
@@ -114,7 +126,11 @@
     },
     "/api/patients/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Consultar paciente por ID",
+        "description": "Obtiene la información de un paciente específico mediante su identificador. Requiere autenticación JWT y rol RECEPCIONISTA.",
         "parameters": [
           {
             "name": "id",
@@ -161,7 +177,11 @@
     },
     "/api/doctors/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Listar médicos",
+        "description": "Obtiene el listado de médicos registrados en la clínica, incluyendo su información profesional. Requiere autenticación JWT y rol RECEPCIONISTA.",
         "parameters": [
           {
             "name": "specialty",
@@ -204,7 +224,11 @@
     },
     "/api/doctors/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Consultar médico por ID",
+        "description": "Obtiene la información de un médico específico mediante su identificador. Requiere autenticación JWT y rol RECEPCIONISTA.",
         "parameters": [
           {
             "name": "id",
@@ -251,7 +275,11 @@
     },
     "/api/doctors/{id}/appointments": {
       "get": {
-        "description": "",
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Consultar agenda médica",
+        "description": "Obtiene las citas asignadas al médico indicado, permitiendo consultar su agenda según los filtros disponibles. El médico autenticado únicamente puede consultar su propia agenda.",
         "parameters": [
           {
             "name": "id",
@@ -309,32 +337,80 @@
     },
     "/api/auth/register": {
       "post": {
-        "description": "",
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Registrar un usuario",
+        "description": "Permite a GERENCIA registrar usuarios. Requiere autenticación JWT. Para usuarios MEDICO, doctorId es obligatorio y debe corresponder a un médico existente.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Usuario registrado correctamente"
+          },
+          "400": {
+            "description": "Datos inválidos o referencia al médico no válida"
+          },
+          "401": {
+            "description": "Token no proporcionado o inválido"
+          },
+          "403": {
+            "description": "No tienes permiso para registrar usuarios"
+          },
+          "404": {
+            "description": "El médico indicado no existe"
+          },
+          "409": {
+            "description": "Correo electrónico ya registrado"
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Error al registrar el usuario"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "role"
+                ],
                 "properties": {
                   "email": {
-                    "example": "any"
+                    "type": "string",
+                    "example": "medico@clinica.com"
                   },
                   "password": {
-                    "example": "any"
+                    "type": "string",
+                    "example": "123456"
                   },
                   "role": {
-                    "example": "any"
+                    "type": "string",
+                    "enum": [
+                      "RECEPCIONISTA",
+                      "MEDICO",
+                      "GERENCIA"
+                    ],
+                    "example": "MEDICO"
                   },
                   "doctorId": {
-                    "example": "any"
+                    "type": "integer",
+                    "example": 1
                   }
                 }
               }
@@ -345,29 +421,40 @@
     },
     "/api/auth/login": {
       "post": {
-        "description": "",
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Iniciar sesión",
+        "description": "Autentica un usuario y devuelve un token JWT.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Inicio de sesión exitoso"
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Credenciales inválidas"
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Error al iniciar sesión"
           }
         },
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
-                    "example": "any"
+                    "type": "string",
+                    "example": "medico@clinica.com"
                   },
                   "password": {
-                    "example": "any"
+                    "type": "string",
+                    "example": "123456"
                   }
                 }
               }
@@ -378,7 +465,11 @@
     },
     "/api/appointments/": {
       "post": {
-        "description": "",
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Registrar una cita médica",
+        "description": "Crea una nueva cita médica asociando un paciente con un médico y una fecha de atención. Requiere autenticación JWT y rol RECEPCIONISTA.",
         "parameters": [
           {
             "name": "authorization",
@@ -437,7 +528,11 @@
     },
     "/api/appointments/{id}/status": {
       "patch": {
-        "description": "",
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Actualizar estado de una cita",
+        "description": "Permite actualizar el estado de una cita médica. Requiere autenticación JWT y rol MEDICO.",
         "parameters": [
           {
             "name": "id",
@@ -498,7 +593,11 @@
     },
     "/api/reports/appointments-by-specialty": {
       "get": {
-        "description": "",
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Consultar citas por especialidad",
+        "description": "Genera un reporte con la cantidad de citas agrupadas por especialidad médica. Disponible únicamente para usuarios con rol GERENCIA.",
         "parameters": [
           {
             "name": "authorization",
@@ -531,7 +630,11 @@
     },
     "/api/reports/daily-cutoff": {
       "get": {
-        "description": "",
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Consultar corte diario",
+        "description": "Genera un resumen de las citas correspondientes a una fecha específica, agrupadas según su estado. Requiere autenticación JWT y rol GERENCIA.",
         "parameters": [
           {
             "name": "date",

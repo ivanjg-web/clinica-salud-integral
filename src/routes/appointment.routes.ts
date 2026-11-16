@@ -19,7 +19,12 @@ router.post(
   authorize("RECEPCIONISTA"),
   validateAppointment,
   (req, res) => {
-    /* #swagger.security = [{ "bearerAuth": [] }] */
+    /*
+      #swagger.tags = ['Citas']
+      #swagger.summary = 'Registrar una cita médica'
+      #swagger.description = 'Crea una nueva cita médica asociando un paciente con un médico y una fecha de atención. Requiere autenticación JWT y rol RECEPCIONISTA.'
+      #swagger.security = [{ "bearerAuth": [] }]
+    */
     return crearCita(req, res);
   },
 );
@@ -30,7 +35,12 @@ router.patch(
   authorize("MEDICO"),
   validateAppointmentStatus,
   (req, res) => {
-    /* #swagger.security = [{ "bearerAuth": [] }] */
+    /*
+      #swagger.tags = ['Citas']
+      #swagger.summary = 'Actualizar estado de una cita'
+      #swagger.description = 'Permite actualizar el estado de una cita médica. Requiere autenticación JWT y rol MEDICO.'
+      #swagger.security = [{ "bearerAuth": [] }]
+    */
     return actualizarEstadoCita(req, res);
   },
 );
